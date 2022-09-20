@@ -2,7 +2,7 @@ let panierStorage = JSON.parse(localStorage.getItem("monPanier"));
 let monprix = [] ; // Création d'un tableau  => stocker les prix des canapés via l'api
 
 
-// récupère les infos à afficher dans le panier depuis LS
+// récupère les infos à afficher dans le panier depuis LS & API
 for (const iterator of panierStorage) {
   let section = document.querySelector("#cart__items");
   let article = document.createElement("article");
