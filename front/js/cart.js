@@ -1,6 +1,5 @@
 let panierStorage = JSON.parse(localStorage.getItem("monPanier"));
-let monprix = [] ; // Création d'un tableau  => stocker les prix des canapés via l'api
-
+let monprix = []; // Création d'un tableau  => stocker les prix des canapés via l'api
 
 // récupère les infos à afficher dans le panier depuis LS & API
 for (const iterator of panierStorage) {
@@ -81,22 +80,13 @@ for (const iterator of panierStorage) {
       .then((product) => {
         para2.innerText = product.price * iterQ;
         monprix.push(product.price * iterQ);
-         total = monprix.reduce((a, b) => a + b, 0, monprix); // tableau prix total pour tous les canapés
-         const prixTotal = document.getElementById("totalPrice");
+        total = monprix.reduce((a, b) => a + b, 0, monprix); // tableau prix total pour tous les canapés
+        const prixTotal = document.getElementById("totalPrice");
         prixTotal.textContent = total;
       })
       .catch((err) => console.log("mess : " + err))
   );
-  
 }
-
-
-  
-
- 
-
-
-
 
 // Calcul quantité total du panier
 function totalArticle() {
@@ -318,9 +308,9 @@ order.addEventListener("click", (e) => {
   };
   //Tableau avec ID
   let products = panierStorage.map((product) => product.id);
-
-  console.log(contact, products);
-  fetch("http://localhost:3000/api/products/order", {
+if(validFirstName == true && validLastName == true && 
+  validAddress == true && validCity == true && validEmail == true){
+    fetch("http://localhost:3000/api/products/order", {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -334,4 +324,9 @@ order.addEventListener("click", (e) => {
       console.log(data.orderId);
     })
   );
+  } else {
+    alert('Formulaire Invalide !')
+  }
+ 
+  
 });

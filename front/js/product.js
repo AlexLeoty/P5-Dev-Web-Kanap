@@ -56,7 +56,6 @@ btn.addEventListener("click", () => {
       name: titre.innerText,
       color: choixColor,
       quantite: Number(choixQty),
-      price: Number(price.innerText),
       Image: im,
     };
 
