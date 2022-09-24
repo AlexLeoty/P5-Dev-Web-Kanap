@@ -56,7 +56,6 @@ btn.addEventListener("click", () => {
       name: titre.innerText,
       color: choixColor,
       quantite: Number(choixQty),
-      price: Number(price.innerText),
       Image: im,
     };
 
@@ -71,7 +70,7 @@ btn.addEventListener("click", () => {
       if (getProductStorage) {
         getProductStorage.quantite += monProduit.quantite;
         localStorage.setItem("monPanier", JSON.stringify(panierStorage)); // Sauvegarde et sérialise
-
+        alert("panier mis à jour !");
        return; // Sors de  l'instruction pour éviter de push en doublons
       }
       panierStorage.push(monProduit);

@@ -1,5 +1,5 @@
-
 let panierStorage = JSON.parse(localStorage.getItem("monPanier"));
+let monprix = []; // Création d'un tableau  => stocker les prix des canapés via l'api
 
 // récupère les infos à afficher dans le panier depuis LS
 for (const iterator of panierStorage) {
@@ -9,6 +9,8 @@ for (const iterator of panierStorage) {
   section.appendChild(article);
   article.setAttribute("class", "cart__item");
   article.setAttribute("data-id", iterator.id); // data.id du canapé
+  let iter = iterator.id; // Stockage ID dans une variable
+
   article.setAttribute("data-color", iterator.color); // data.couleur du canapé
   let div = document.createElement("div");
   article.appendChild(div);
@@ -31,13 +33,12 @@ for (const iterator of panierStorage) {
   titre.innerText = iterator.name; // nom du canapé
 
   let para = document.createElement("p");
-  let para2 = document.createElement("p");
+  // let para2 = document.createElement("p");
   let para3 = document.createElement("p");
   let para4 = document.createElement("p");
   div3.appendChild(para);
   para.innerText = iterator.color; // couleur du canapé
-  div3.appendChild(para2);
-  para2.innerText = iterator.price * iterator.quantite; // prix du produit en fonction de sa quantité
+
   let div4 = document.createElement("div");
   let div5 = document.createElement("div");
   let div6 = document.createElement("div");
@@ -57,28 +58,35 @@ for (const iterator of panierStorage) {
   input.setAttribute("min", "0");
   input.setAttribute("max", "100");
   input.setAttribute("value", iterator.quantite);
+  let iterQ = iterator.quantite; // Stockage quantité dans une variable
 
   div4.appendChild(div6);
   div6.setAttribute("class", "cart__item__content__settings__delete");
   div6.appendChild(para4);
   para4.setAttribute("class", "deleteItem");
   para4.innerText = "Supprimer";
+
+  //Appel de l'API => prix
+
+  let url = `http://localhost:3000/api/products/${iter}`;
+
+  div3.setAttribute("class", "cart__item__content__description");
+  let para2 = document.createElement("p");
+  div3.appendChild(para2);
+
+  fetch(url).then((response) =>
+    response
+      .json()
+      .then((product) => {
+        para2.innerText = product.price * iterQ;
+        monprix.push(product.price * iterQ);
+        total = monprix.reduce((a, b) => a + b, 0, monprix); // tableau prix total pour tous les canapés
+        const prixTotal = document.getElementById("totalPrice");
+        prixTotal.textContent = total;
+      })
+      .catch((err) => console.log("mess : " + err))
+  );
 }
-
-
-
-// calcul le prix total du panier
-function totalPrice() {
-  let calculPrix = []; 
-  for (i = 0; i < panierStorage.length; i++) {
-    const montant = panierStorage[i].price * panierStorage[i].quantite; // variable sotcke le prix et la quantité de chaque canapé
-    calculPrix.push(montant); // tableau prixTotal pour chaque canapé
-    total = calculPrix.reduce((a, b) => a + b, 0); // tableau prix total pour tous les canapés
-  }
-  const prixTotal = document.getElementById("totalPrice");
-  prixTotal.textContent = total;
-}
-totalPrice();
 
 // Calcul quantité total du panier
 function totalArticle() {
@@ -99,39 +107,36 @@ let modifQty = document.querySelectorAll(".itemQuantity"); // Selection de l'inp
 
 function modifQtyEle() {
   for (let k = 0; k < modifQty.length; k++) {
-    modifQty[k].addEventListener("change", (event) => {    // pour chaque input...
+    modifQty[k].addEventListener("change", (event) => {
+      // pour chaque input...
       event.preventDefault();
 
       let id = modifQty[k].closest("article").dataset.id; // id de chaque canapé selon input
       let color = modifQty[k].closest("article").dataset.color; // color de chaque canapé selon input
-      
-      if(modifQty[k].value >=1) {
-      let kanapFind = panierStorage.find((item) => {
-        return item.id == id && item.color == color;
-      });
-       kanapFind.quantite = parseInt(event.target.value); 
-      localStorage.setItem("monPanier", JSON.stringify(panierStorage)); // Sauvegarde et sérialise
 
-     window.location.reload();
-     
-  }else {   //Sinon si qty à 0 =>suppr canapé
-    panierStorage = panierStorage.filter(
-      (elt) => elt.id !== id || elt.color !== color
-    );
+      if (modifQty[k].value >= 1) {
+        let kanapFind = panierStorage.find((item) => {
+          return item.id == id && item.color == color;
+        });
+        kanapFind.quantite = parseInt(event.target.value);
+        localStorage.setItem("monPanier", JSON.stringify(panierStorage)); // Sauvegarde et sérialise
 
-    localStorage.setItem("monPanier", JSON.stringify(panierStorage)); // Sauvegarde et sérialise
+        window.location.reload();
+      } else {
+        //Sinon si qty à 0 =>suppr canapé
+        panierStorage = panierStorage.filter(
+          (elt) => elt.id !== id || elt.color !== color
+        );
 
-    window.location.reload();
-  }
+        localStorage.setItem("monPanier", JSON.stringify(panierStorage)); // Sauvegarde et sérialise
+
+        window.location.reload();
+      }
     });
   }
-};
+}
 
 modifQtyEle();
-
-
-
-
 
 //  supprimer élément du panier
 let supprimer = document.querySelectorAll(".deleteItem");
@@ -157,170 +162,193 @@ function supprEle() {
 }
 supprEle();
 
-    //////////////////////////// Valider les données du formulaire ///////////////////////
+//////////////////////////// Valider les données du formulaire ///////////////////////
 
-    //Séléection du form
-   let form = document.querySelector('.cart__order__form');
+//Séléection du form
+let form = document.querySelector(".cart__order__form");
 
-    // Séléction des inputs
-   let firstName = document.getElementById('firstName');
-   let lastName =  document.getElementById('lastName');
-   let adress = document.getElementById('adress');
-   let city  = document.getElementById('city');
-   let email =  document.getElementById('email');
+// Séléction des inputs
+let firstName = document.getElementById("firstName");
+let lastName = document.getElementById("lastName");
+let adress = document.getElementById("address");
+let city = document.getElementById("city");
+let email = document.getElementById("email");
 
+// Evénement d'écoute pour chaque input
 
-  // Evénement d'écoute pour chaque input
+firstName.addEventListener("change", function () {
+  validFirstName(this);
+});
+lastName.addEventListener("change", function () {
+  validLastName(this);
+});
+adress.addEventListener("change", function () {
+  validAddress(this);
+});
+city.addEventListener("change", function () {
+  validCity(this);
+});
+email.addEventListener("change", function () {
+  validEmail(this);
+});
 
-     form.firstName.addEventListener('change', function ()  {validFirstName(this)}  );
-     form.lastName.addEventListener('change', function ()  {validLastName(this)}  );
-     form.address.addEventListener('change', function () {validAddress(this)}  );
-     form.city.addEventListener('change', function ()  {validCity(this)}  );
-     form.email.addEventListener('change', function () {validEmail(this)}  );
+//Fonctions de validation
+let testEmail;
+let testCity;
+let testAddress;
+let testLastName;
+let testFirstName;
+//Validation firstName
+const validFirstName = function (element) {
+  let filtre = /^[A-Za-zÀ-ÖØ-öø-ÿ-]+$/g;
 
+  // true or false
+  testFirstName = filtre.test(element.value);
+  console.log(testFirstName); // true or false
 
-     //Fonctions de validation
+  // Récup balise message erreur
+  let errorFirstName = document.querySelector("#firstNameErrorMsg");
 
-     //Validation firstName
-     const validFirstName = function(element) {
-      let filtre = /^[A-Za-zÀ-ÖØ-öø-ÿ-]+$/g;
+  // Test regex
+  if (testFirstName == true) {
+    errorFirstName.innerText = "Prénom valide";
+    errorFirstName.style.color = "green";
+  } else {
+    errorFirstName.innerText = "Prénom invalide";
+    errorFirstName.style.color = "red";
+  }
+};
+// Validation lastName
+const validLastName = function (element) {
+  let filtre = /^[A-Za-zÀ-ÖØ-öø-ÿ-]+$/g;
 
-      // true or false
-      let testFirstName = filtre.test(element.value);
-      console.log(testFirstName); // true or false
+  // Récup balise message erreur
+  let errorLastName = document.querySelector("#lastNameErrorMsg");
+  // true or false
+  testLastName = filtre.test(element.value);
+  console.log(testLastName); // true or false
 
-      // Récup balise message erreur
-      let errorFirstName = document.querySelector('#firstNameErrorMsg');
+  // Test regex
+  if (testLastName) {
+    errorLastName.innerText = "Nom valide";
+    errorLastName.style.color = "green";
+  } else {
+    errorLastName.innerText = "Nom invalide";
+    errorLastName.style.color = "red";
+  }
+};
+// Validation address
+const validAddress = function (element) {
+  let filtreAddress = /^[\w ÖØ-öø-ÿ-]+$/g;
 
+  // Récup balise message erreur
+  let errorAddress = document.querySelector("#addressErrorMsg");
 
-      // Test regex
-      if(testFirstName == true) {
-        errorFirstName.innerText = 'Prénom valide';
-        errorFirstName.style.color = 'green';
-        
-      } else {
-        errorFirstName.innerText = 'Prénom invalide';
-        errorFirstName.style.color = 'red';
-     
-      }
-     };
-     // Validation lastName
-     const validLastName = function(element) {
-      let filtre = /^[A-Za-zÀ-ÖØ-öø-ÿ-]+$/g;
+  testAddress = filtreAddress.test(element.value);
+  console.log(testAddress); // true or false
 
-      // Récup balise message erreur
-      let errorLastName = document.querySelector('#lastNameErrorMsg');
-       // true or false
-       let testLastName = filtre.test(element.value);
-       console.log(testLastName); // true or false
+  // Test regex
+  if (testAddress) {
+    errorAddress.innerText = "Adresse saisie valide";
+    errorAddress.style.color = "green";
+  } else {
+    errorAddress.innerText = "Adresse saisie invalide";
+    errorAddress.style.color = "red";
+  }
+};
+// Validation city
+const validCity = function (element) {
+  let filtreCity = /^[A-Za-zÀ-ÖØ-öø-ÿ-' ]+$/g;
 
-       // Test regex
-      if(testLastName) {
-        errorLastName.innerText = 'Nom valide';
-        errorLastName.style.color = 'green';
-        
-      } else {
-        errorLastName.innerText = 'Nom invalide';
-        errorLastName.style.color = 'red';
-     
-      }
-    };
-     // Validation address
-     const validAddress = function(element) {
-      let filtreAddress = /^[\w ÖØ-öø-ÿ-]+$/g;
+  // Récup balise message erreur
+  let errorCity = document.querySelector("#cityErrorMsg");
 
-      // Récup balise message erreur
-      let errorAddress = document.querySelector('#addressErrorMsg');
+  testCity = filtreCity.test(element.value);
+  console.log(testCity); // true or false
 
-      let testAddress = filtreAddress.test(element.value);
-       console.log(testAddress); // true or false
+  // Test regex
+  if (testCity) {
+    errorCity.innerText = "Ville saisie valide";
+    errorCity.style.color = "green";
+  } else {
+    errorCity.innerText = "Ville saisie invalide";
+    errorCity.style.color = "red";
+  }
+};
+// Validation email
+const validEmail = function (element) {
+  let filtreEmail = /^[\w.-]+[@]{1}[\w.-]+[.]{1}[a-z]{2,63}$/g;
 
-       // Test regex
-      if(testAddress) {
-        errorAddress.innerText = 'Adresse saisie valide';
-        errorAddress.style.color = 'green';
-        
-      } else {
-        errorAddress.innerText = 'Adresse saisie invalide';
-        errorAddress.style.color = 'red';
-     
-      }
-    };
-     // Validation city
-     const validCity = function(element) {
-      let filtreCity = /^[A-Za-zÀ-ÖØ-öø-ÿ-' ]+$/g;
+  // Récup balise message erreur
+  let errorEmail = document.querySelector("#emailErrorMsg");
 
-      // Récup balise message erreur
-      let errorCity = document.querySelector('#cityErrorMsg');
+  testEmail = filtreEmail.test(element.value);
+  console.log(testEmail); // true or false
 
-      let testCity = filtreCity.test(element.value);
-       console.log(testCity); // true or false
+  // Test regex
+  if (testEmail) {
+    errorEmail.innerText = "Mail saisie valide";
+    errorEmail.style.color = "green";
+  } else {
+    errorEmail.innerText = "Mail saisie invalide";
+    errorEmail.style.color = "red";
+  }
+};
 
-       // Test regex
-      if(testCity ) {
-        errorCity.innerText = 'Ville saisie valide';
-        errorCity.style.color = 'green';
-        
-      } else {
-        errorCity.innerText = 'Ville saisie invalide';
-        errorCity.style.color = 'red';
-     
-      }
-    };
-     // Validation email
-     const validEmail = function(element) {
-      let filtreEmail = /^[\w.-]+[@]{1}[\w.-]+[.]{1}[a-z]{2,63}$/g;
+////////// Envoi formulaire ////////////////
 
-      // Récup balise message erreur
-      let errorEmail = document.querySelector('#emailErrorMsg');
+const order = document.querySelector("#order"); //variable du bouton commander
 
-      let testEmail = filtreEmail.test(element.value);
-      console.log(testEmail); // true or false
+order.addEventListener("click", (e) => {
+e.preventDefault();  
 
-      // Test regex
-     if(testEmail) {
-       errorEmail.innerText = 'Mail saisie valide';
-       errorEmail.style.color = 'green';
-       
-     } else {
-       errorEmail.innerText = 'Mail saisie invalide';
-       errorEmail.style.color = 'red';
-    
-     }
-    };
-    
-  ////////// Envoi formulaire ////////////////
+  //Création objet fiche client
+  let contact = {
+    firstName: firstName.value,
+    lastName: lastName.value,
+    address: adress.value,
+    city: city.value,
+    email: email.value,
+  };
+  if (  // si formulaire vide
+    firstName.value === "" ||
+    lastName.value === "" ||
+    adress.value === "" ||
+    city.value === "" ||
+    email.value === ""
+  ) {
+    alert('Champs du formulaires vident !')
+    return;
+  }
+  if ( // si données formulaires incorrect
+    testAddress == false ||
+    testCity == false ||
+    testEmail == false ||
+    testFirstName == false ||
+    testLastName == false
+  ) {
+    alert("Données du formulaires invalides !");
+  } else { // si tout est ok
+ //Tableau avec ID
+ let products = panierStorage.map((product) => product.id);
 
-const order = document.querySelector('#order');//variable du bouton commander
+ fetch("http://localhost:3000/api/products/order", {
+   method: "POST",
+   headers: {
+     Accept: "application/json",
+     "Content-type": "application/json",
+   },
 
-  order.addEventListener('click', (e) => {
-     e.preventDefault();
-
-     //Création objet fiche client
-     let contact = {
-      firstName: form.firstName.value,
-      lastName: form.lastName.value,
-      address: form.address.value,
-      city: form.city.value,
-      email: form.email.value
-    };
-    //Tableau avec ID
-    let products = panierStorage.map((product) => product.id);
-    
-console.log(contact, products);
-           fetch("http://localhost:3000/api/products/order", {
-          method: "POST",
-          headers: {
-            "Accept": "application/json",
-            "Content-type": "application/json"},
-
-            body:JSON.stringify({contact, products}),
-        })
-        .then((response) => response.json()
-        .then((data) => {
-          location.href = `confirmation.html?id=${data.orderId}`;
-          console.log(data.orderId);
-        }))
-       
+   body: JSON.stringify({ contact, products }),
+ }).then((response) => response.json()
+   .then((data) => {
+     location.href = `confirmation.html?id=${data.orderId}`;
+     console.log(data.orderId);
+   })
+  
+ ) .catch(error => (error));
+  }
+   
+  
     
 });
