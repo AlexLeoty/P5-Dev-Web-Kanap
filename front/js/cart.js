@@ -170,17 +170,12 @@ let form = document.querySelector(".cart__order__form");
 // Séléction des inputs
 let firstName = document.getElementById("firstName");
 let lastName = document.getElementById("lastName");
-<<<<<<< HEAD
 let adress = document.getElementById("address");
-=======
-let adress = document.getElementById("adress");
->>>>>>> baa5b879272cefb99ce55018c955544a94fed8de
 let city = document.getElementById("city");
 let email = document.getElementById("email");
 
 // Evénement d'écoute pour chaque input
 
-<<<<<<< HEAD
 firstName.addEventListener("change", function () {
   validFirstName(this);
 });
@@ -194,44 +189,21 @@ city.addEventListener("change", function () {
   validCity(this);
 });
 email.addEventListener("change", function () {
-=======
-form.firstName.addEventListener("change", function () {
-  validFirstName(this);
-});
-form.lastName.addEventListener("change", function () {
-  validLastName(this);
-});
-form.address.addEventListener("change", function () {
-  validAddress(this);
-});
-form.city.addEventListener("change", function () {
-  validCity(this);
-});
-form.email.addEventListener("change", function () {
->>>>>>> baa5b879272cefb99ce55018c955544a94fed8de
   validEmail(this);
 });
 
 //Fonctions de validation
-<<<<<<< HEAD
 let testEmail;
 let testCity;
 let testAddress;
 let testLastName;
 let testFirstName;
-=======
-
->>>>>>> baa5b879272cefb99ce55018c955544a94fed8de
 //Validation firstName
 const validFirstName = function (element) {
   let filtre = /^[A-Za-zÀ-ÖØ-öø-ÿ-]+$/g;
 
   // true or false
-<<<<<<< HEAD
   testFirstName = filtre.test(element.value);
-=======
-  let testFirstName = filtre.test(element.value);
->>>>>>> baa5b879272cefb99ce55018c955544a94fed8de
   console.log(testFirstName); // true or false
 
   // Récup balise message erreur
@@ -253,11 +225,7 @@ const validLastName = function (element) {
   // Récup balise message erreur
   let errorLastName = document.querySelector("#lastNameErrorMsg");
   // true or false
-<<<<<<< HEAD
   testLastName = filtre.test(element.value);
-=======
-  let testLastName = filtre.test(element.value);
->>>>>>> baa5b879272cefb99ce55018c955544a94fed8de
   console.log(testLastName); // true or false
 
   // Test regex
@@ -276,11 +244,7 @@ const validAddress = function (element) {
   // Récup balise message erreur
   let errorAddress = document.querySelector("#addressErrorMsg");
 
-<<<<<<< HEAD
   testAddress = filtreAddress.test(element.value);
-=======
-  let testAddress = filtreAddress.test(element.value);
->>>>>>> baa5b879272cefb99ce55018c955544a94fed8de
   console.log(testAddress); // true or false
 
   // Test regex
@@ -299,11 +263,7 @@ const validCity = function (element) {
   // Récup balise message erreur
   let errorCity = document.querySelector("#cityErrorMsg");
 
-<<<<<<< HEAD
   testCity = filtreCity.test(element.value);
-=======
-  let testCity = filtreCity.test(element.value);
->>>>>>> baa5b879272cefb99ce55018c955544a94fed8de
   console.log(testCity); // true or false
 
   // Test regex
@@ -322,11 +282,7 @@ const validEmail = function (element) {
   // Récup balise message erreur
   let errorEmail = document.querySelector("#emailErrorMsg");
 
-<<<<<<< HEAD
   testEmail = filtreEmail.test(element.value);
-=======
-  let testEmail = filtreEmail.test(element.value);
->>>>>>> baa5b879272cefb99ce55018c955544a94fed8de
   console.log(testEmail); // true or false
 
   // Test regex
@@ -344,7 +300,6 @@ const validEmail = function (element) {
 const order = document.querySelector("#order"); //variable du bouton commander
 
 order.addEventListener("click", (e) => {
-<<<<<<< HEAD
 e.preventDefault();  
 
   //Création objet fiche client
@@ -396,39 +351,4 @@ e.preventDefault();
    
   
     
-=======
-  e.preventDefault();
-
-  //Création objet fiche client
-  let contact = {
-    firstName: form.firstName.value,
-    lastName: form.lastName.value,
-    address: form.address.value,
-    city: form.city.value,
-    email: form.email.value,
-  };
-  //Tableau avec ID
-  let products = panierStorage.map((product) => product.id);
-if(validFirstName == true && validLastName == true && 
-  validAddress == true && validCity == true && validEmail == true){
-    fetch("http://localhost:3000/api/products/order", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-type": "application/json",
-    },
-
-    body: JSON.stringify({ contact, products }),
-  }).then((response) =>
-    response.json().then((data) => {
-      location.href = `confirmation.html?id=${data.orderId}`;
-      console.log(data.orderId);
-    })
-  );
-  } else {
-    alert('Formulaire Invalide !')
-  }
- 
-  
->>>>>>> baa5b879272cefb99ce55018c955544a94fed8de
 });
