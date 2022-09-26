@@ -310,17 +310,16 @@ e.preventDefault();
     city: city.value,
     email: email.value,
   };
-  if (  // si formulaire vide
-    firstName.value === "" ||
-    lastName.value === "" ||
+  // si formulaire vide
+  if (firstName.value === "" ||  lastName.value === "" ||
     adress.value === "" ||
     city.value === "" ||
-    email.value === ""
-  ) {
+    email.value === "" ) {
     alert('Champs du formulaires vident !')
     return;
   }
-  if ( // si données formulaires incorrect
+  // si données formulaires incorrect
+  if ( 
     testAddress == false ||
     testCity == false ||
     testEmail == false ||
