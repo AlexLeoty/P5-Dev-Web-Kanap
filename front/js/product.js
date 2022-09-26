@@ -1,6 +1,8 @@
+let protocole = "http://";
+let domaine = "localhost:3000/api/products/"
 let adresse = new URLSearchParams(window.location.search);
 let idKanap = adresse.get("id");
-let url = `http://localhost:3000/api/products/${idKanap}`;
+let url = `${protocole}${domaine}${idKanap}`;
 
 let titre = document.querySelector("#title");
 let price = document.querySelector("#price");
@@ -10,7 +12,8 @@ let color = document.querySelector("#colors");
 let myImg = document.createElement("img");
 let im = "";
 
-fetch(url).then((response) =>
+function callOneProduct() {
+  fetch(url).then((response) =>
   response.json().then((product) => {
     titre.innerText = `${product.name}`;
 
@@ -31,10 +34,12 @@ fetch(url).then((response) =>
     });
   })
 );
+}
+callOneProduct();
+
 
 // Sélection du bouton 'Ajouter au panier'
 let btn = document.querySelector("#addToCart");
-
 // evenement d'écoute au bouton ajout panier
 btn.addEventListener("click", () => {
   let choixQty = document.querySelector("#quantity").value; // Selection du choix de la quantité

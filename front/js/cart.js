@@ -1,92 +1,97 @@
-let panierStorage = JSON.parse(localStorage.getItem("monPanier"));
-let monprix = []; // Création d'un tableau  => stocker les prix des canapés via l'api
+let panierStorage = JSON.parse(localStorage.getItem("monPanier")); 
+let monprix = []; // Création d'un tableau  => stocker le prix total des canapés via l'api
+let protocole = "http://";
+let domaine = "localhost:3000/api/products/"
 
-// récupère les infos à afficher dans le panier depuis LS & API
-for (const iterator of panierStorage) {
-  let section = document.querySelector("#cart__items");
-  let article = document.createElement("article");
-
-  section.appendChild(article);
-  article.setAttribute("class", "cart__item");
-  article.setAttribute("data-id", iterator.id); // data.id du canapé
-  let iter = iterator.id; // Stockage ID dans une variable
-
-  article.setAttribute("data-color", iterator.color); // data.couleur du canapé
-  let div = document.createElement("div");
-  article.appendChild(div);
-  div.setAttribute("class", "cart__item__img");
-
-  let img = document.createElement("img");
-  div.appendChild(img);
-  img.setAttribute("src", "");
-  img.src = iterator.Image; // image du canapé
-  img.setAttribute("alt", "Photographie d'un canapé");
-
-  let div2 = document.createElement("div");
-  article.appendChild(div2);
-  div2.setAttribute("class", "cart__item__content");
-  let div3 = document.createElement("div");
-  div3.setAttribute("class", "cart__item__content__description");
-  div2.appendChild(div3);
-  let titre = document.createElement("h2");
-  div3.appendChild(titre);
-  titre.innerText = iterator.name; // nom du canapé
-
-  let para = document.createElement("p");
-  // let para2 = document.createElement("p");
-  let para3 = document.createElement("p");
-  let para4 = document.createElement("p");
-  div3.appendChild(para);
-  para.innerText = iterator.color; // couleur du canapé
-
-  let div4 = document.createElement("div");
-  let div5 = document.createElement("div");
-  let div6 = document.createElement("div");
-
-  article.appendChild(div4);
-  div4.setAttribute("class", "cart__item__content__settings");
-  div4.appendChild(div5);
-  div5.setAttribute("class", "cart__item__content__settings__quantity");
-  div5.appendChild(para3);
-  para3.innerText = "Qté :";
-
-  let input = document.createElement("input");
-  div5.appendChild(input);
-  input.setAttribute("type", "number");
-  input.setAttribute("class", "itemQuantity");
-  input.setAttribute("name", "itemQuantity");
-  input.setAttribute("min", "0");
-  input.setAttribute("max", "100");
-  input.setAttribute("value", iterator.quantite);
-  let iterQ = iterator.quantite; // Stockage quantité dans une variable
-
-  div4.appendChild(div6);
-  div6.setAttribute("class", "cart__item__content__settings__delete");
-  div6.appendChild(para4);
-  para4.setAttribute("class", "deleteItem");
-  para4.innerText = "Supprimer";
-
-  //Appel de l'API => prix
-
-  let url = `http://localhost:3000/api/products/${iter}`;
-
-  div3.setAttribute("class", "cart__item__content__description");
-  let para2 = document.createElement("p");
-  div3.appendChild(para2);
-
-  fetch(url).then((response) =>
-    response
-      .json()
-      .then((product) => {
-        para2.innerText = product.price * iterQ;
-        monprix.push(product.price * iterQ);
-        total = monprix.reduce((a, b) => a + b, 0, monprix); // tableau prix total pour tous les canapés
-        const prixTotal = document.getElementById("totalPrice");
-        prixTotal.textContent = total;
-      })
-      .catch((err) => console.log("mess : " + err))
-  );
+// récupère les infos à afficher dans le panier depuis LocalStorage & API
+function displayBasket() {
+  for (const iterator of panierStorage) {
+    let section = document.querySelector("#cart__items");
+    let article = document.createElement("article");
+  
+    section.appendChild(article);
+    article.setAttribute("class", "cart__item");
+    article.setAttribute("data-id", iterator.id); // data.id du canapé
+    let iter = iterator.id; // Stockage ID dans une variable
+  
+    article.setAttribute("data-color", iterator.color); // data.couleur du canapé
+    let div = document.createElement("div");
+    article.appendChild(div);
+    div.setAttribute("class", "cart__item__img");
+  
+    let img = document.createElement("img");
+    div.appendChild(img);
+    img.setAttribute("src", "");
+    img.src = iterator.Image; // image du canapé
+    img.setAttribute("alt", "Photographie d'un canapé");
+  
+    let div2 = document.createElement("div");
+    article.appendChild(div2);
+    div2.setAttribute("class", "cart__item__content");
+    let div3 = document.createElement("div");
+    div3.setAttribute("class", "cart__item__content__description");
+    div2.appendChild(div3);
+    let titre = document.createElement("h2");
+    div3.appendChild(titre);
+    titre.innerText = iterator.name; // nom du canapé
+  
+    let para = document.createElement("p");
+    // let para2 = document.createElement("p");
+    let para3 = document.createElement("p");
+    let para4 = document.createElement("p");
+    div3.appendChild(para);
+    para.innerText = iterator.color; // couleur du canapé
+  
+    let div4 = document.createElement("div");
+    let div5 = document.createElement("div");
+    let div6 = document.createElement("div");
+  
+    article.appendChild(div4);
+    div4.setAttribute("class", "cart__item__content__settings");
+    div4.appendChild(div5);
+    div5.setAttribute("class", "cart__item__content__settings__quantity");
+    div5.appendChild(para3);
+    para3.innerText = "Qté :";
+  
+    let input = document.createElement("input");
+    div5.appendChild(input);
+    input.setAttribute("type", "number");
+    input.setAttribute("class", "itemQuantity");
+    input.setAttribute("name", "itemQuantity");
+    input.setAttribute("min", "0");
+    input.setAttribute("max", "100");
+    input.setAttribute("value", iterator.quantite);
+    let iterQ = iterator.quantite; // Stockage quantité dans une variable
+  
+    div4.appendChild(div6);
+    div6.setAttribute("class", "cart__item__content__settings__delete");
+    div6.appendChild(para4);
+    para4.setAttribute("class", "deleteItem");
+    para4.innerText = "Supprimer";
+  
+    //Appel de l'API => prix
+    
+    let url = `${protocole}${domaine}${iter}`;
+  // DOM affichage PRIX
+    div3.setAttribute("class", "cart__item__content__description");
+    let para2 = document.createElement("p");
+    div3.appendChild(para2);
+  
+    fetch(url).then((response) =>
+      response
+        .json()
+        .then((product) => {
+          para2.innerText = product.price * iterQ;
+          monprix.push(product.price * iterQ);
+          total = monprix.reduce((a, b) => a + b, 0, monprix); // tableau prix total pour tous les canapés
+          const prixTotal = document.getElementById("totalPrice");
+          prixTotal.textContent = total;
+        })
+        .catch((err) => console.log("mess : " + err))
+    );
+  }
 }
+displayBasket();
 
 // Calcul quantité total du panier
 function totalArticle() {
@@ -102,8 +107,8 @@ function totalArticle() {
 }
 totalArticle();
 
-// modifier quantité panier
-let modifQty = document.querySelectorAll(".itemQuantity"); // Selection de l'input modif qty
+
+let modifQty = document.querySelectorAll(".itemQuantity"); // Selection de l'input modif qty panier
 
 function modifQtyEle() {
   for (let k = 0; k < modifQty.length; k++) {
@@ -138,8 +143,8 @@ function modifQtyEle() {
 
 modifQtyEle();
 
-//  supprimer élément du panier
-let supprimer = document.querySelectorAll(".deleteItem");
+
+let supprimer = document.querySelectorAll(".deleteItem");  //  supprimer élément du panier
 
 function supprEle() {
   for (let s = 0; s < supprimer.length; s++) {
@@ -164,8 +169,6 @@ supprEle();
 
 //////////////////////////// Valider les données du formulaire ///////////////////////
 
-//Séléection du form
-let form = document.querySelector(".cart__order__form");
 
 // Séléction des inputs
 let firstName = document.getElementById("firstName");
@@ -192,7 +195,7 @@ email.addEventListener("change", function () {
   validEmail(this);
 });
 
-//Fonctions de validation
+//Variables  de test des REGEX
 let testEmail;
 let testCity;
 let testAddress;

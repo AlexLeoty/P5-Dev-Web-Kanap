@@ -1,6 +1,10 @@
-let url = "http://localhost:3000/api/products";
+let protocole = "http://";
+let domaine = "localhost:3000/api/products/"
+let url = `${protocole}${domaine}`;
 
-fetch(url).then((response) =>
+
+function callAllProducts() {
+  fetch(url).then((response) =>
   response.json().then((data) => {
     
     for (const iterator of data) {
@@ -29,3 +33,6 @@ fetch(url).then((response) =>
     alert("L\'api ne réponds pas");
   })
 );
+}
+
+callAllProducts();
